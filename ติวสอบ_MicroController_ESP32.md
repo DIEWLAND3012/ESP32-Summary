@@ -209,6 +209,7 @@ flowchart TD
     G --> H
     H --> C
 ```
+![flowchart-png](flowchart.png)
 
 ![flowchart-svg](flowchart.svg)
 
