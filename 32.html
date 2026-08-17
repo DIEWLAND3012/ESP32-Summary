@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คู่มือติวสอบ Microcontroller ESP32 & FreeRTOS</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
+        .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
+        code { font-family: 'Fira Code', 'Consolas', monospace; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased pb-12">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 text-white py-8 px-4 shadow-lg">
+        <div class="max-w-6xl mx-mx-auto max-w-5xl">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <span class="bg-blue-500/30 text-blue-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-blue-400/30">
+                        <i class="fa-solid fa-graduation-cap mr-1"></i> Exam Preparation Guide
+                    </span>
+                    <h1 class="text-3xl md:text-4xl font-bold mt-2">สรุปติวสอบ Microcontroller ESP32</h1>
+                    <p class="text-blue-100 mt-1 text-sm md:text-base">เน้นปูพื้นฐาน C, GPIO, FreeRTOS จากเอกสาร และการออกแบบ Flowchart</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 text-center min-w-[160px]">
+                    <div class="text-2xl font-bold text-yellow-300"><i class="fa-solid fa-microchip"></i> ESP32</div>
+                    <div class="text-xs text-slate-200">ESP-IDF / C Language</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="sticky top-0 bg-white border-b border-slate-200 shadow-sm z-50">
+        <div class="max-w-5xl mx-auto px-4 flex overflow-x-auto gap-2 md:gap-6 text-sm md:text-base scrollbar-none">
+            <button onclick="switchTab('gpio')" id="tab-gpio" class="tab-btn tab-active py-4 px-3 flex items-center gap-2 whitespace-nowrap transition-colors">
+                <i class="fa-solid fa-plug text-blue-600"></i> 1. GPIO & โครงสร้าง
+            </button>
+            <button onclick="switchTab('rtos')" id="tab-rtos" class="tab-btn py-4 px-3 flex items-center gap-2 whitespace-nowrap transition-colors text-slate-600 hover:text-blue-600">
+                <i class="fa-solid fa-tasks text-emerald-600"></i> 2. FreeRTOS (จากใบงาน)
+            </button>
+            <button onclick="switchTab('c-code')" id="tab-c-code" class="tab-btn py-4 px-3 flex items-center gap-2 whitespace-nowrap transition-colors text-slate-600 hover:text-blue-600">
+                <i class="fa-solid fa-code text-purple-600"></i> 3. วิเคราะห์โค้ด C
+            </button>
+            <button onclick="switchTab('flowchart')" id="tab-flowchart" class="tab-btn py-4 px-3 flex items-center gap-2 whitespace-nowrap transition-colors text-slate-600 hover:text-blue-600">
+                <i class="fa-solid fa-diagram-project text-amber-600"></i> 4. Flowchart & ออกแบบ
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto px-4 mt-8">
+
+        <!-- ================= SECTION 1: GPIO ================= -->
+        <section id="sec-gpio" class="tab-content block space-y-6">
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                <h2 class="text-xl font-bold text-blue-900 flex items-center gap-2">
+                    <i class="fa-solid fa-microchip"></i> หมวด 1: GPIO ขาไหนทำอะไร และ โครงสร้างภายใน (3 ข้อย่อย)
+                </h2>
+                <p class="text-sm text-blue-800 mt-1">เก็งแนวข้อสอบเขียนอธิบายโครงสร้างและการนำขาของ ESP32 ไปใช้งานจริง</p>
+            </div>
+
+            <!-- Sub Question 1.1 -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex items-center gap-2 border-b pb-3 border-slate-100">
+                    <span class="bg-blue-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">ข้อย่อย 1.1</span>
+                    <h3 class="font-bold text-lg text-slate-800">ขา GPIO พิเศษของ ESP32 ที่ต้องจำไปตอบในห้องสอบ</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                        <span class="font-bold text-red-700 block mb-1"><i class="fa-solid fa-triangle-exclamation"></i> ขา Input-Only (รับค่าได้อย่างเดียว)</span>
+                        <p class="text-slate-700"><strong>GPI 34, 35, 36 (VP), 39 (VN)</strong></p>
+                        <ul class="list-disc list-inside text-xs text-slate-600 mt-2 space-y-1">
+                            <li>ไม่มี Pull-up / Pull-down resistor ภายใน</li>
+                            <li><strong>ห้าม</strong> กำหนดให้เป็นขา Output เด็ดขาด (สั่งให้ LED ติดไม่ได้)</li>
+                            <li>เหมาะสำหรับรับค่าอนาล็อก (ADC) หรือปุ่มกดภายนอก</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                        <span class="font-bold text-amber-800 block mb-1"><i class="fa-solid fa-gears"></i> Strapping Pins (ขาควบคุมการ Boot)</span>
+                        <p class="text-slate-700"><strong>GPIO 0, 2, 5, 12 (MTDI), 15 (MTDO)</strong></p>
+                        <ul class="list-disc list-inside text-xs text-slate-600 mt-2 space-y-1">
+                            <li>ใช้กำหนดโหมดการบูตของชิป (เช่น Flash Mode vs Normal Run)</li>
+                            <li>หากต่อวงจรภายนอกดึงแรงดันผิดขณะเปิดเครื่อง ESP32 อาจจะเปิดไม่ติด</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-lg md:col-span-2">
+                        <span class="font-bold text-emerald-800 block mb-1"><i class="fa-solid fa-network-wired"></i> ขา Default สื่อสารมาตรฐาน</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs mt-2">
+                            <div class="bg-white p-2 rounded border border-emerald-100">
+                                <strong>UART0:</strong> GPIO 1 (TX), GPIO 3 (RX) <br><span class="text-slate-500">(ใช้คุยกับคอม / Serial Monitor)</span>
+                            </div>
+                            <div class="bg-white p-2 rounded border border-emerald-100">
+                                <strong>I2C:</strong> GPIO 21 (SDA), GPIO 22 (SCL) <br><span class="text-slate-500">(ใช้ต่อจอ OLED / Sensor)</span>
+                            </div>
+                            <div class="bg-white p-2 rounded border border-emerald-100">
+                                <strong>VSPI:</strong> GPIO 18 (CLK), 19 (MISO), 23 (MOSI), 5 (CS)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub Question 1.2 -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex items-center gap-2 border-b pb-3 border-slate-100">
+                    <span class="bg-blue-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">ข้อย่อย 1.2</span>
+                    <h3 class="font-bold text-lg text-slate-800">โครงสร้างภายในวงจร GPIO (GPIO Block Diagram Overview)</h3>
+                </div>
+                <p class="text-sm text-slate-600">วงจรภายในของขา GPIO แต่ละขาประกอบด้วยบล็อกสำคัญที่ทำหน้าที่ต่างกัน ดังนี้:</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                    <div class="p-3 border rounded-lg bg-slate-50">
+                        <div class="font-bold text-slate-800 mb-1">1. Input Buffer & Matrix</div>
+                        <p class="text-slate-600">รับสัญญาณไฟฟ้าภายนอกเข้ามา มี Schmitt Trigger ช่วยลดสัญญาณรบกวน อ่านค่า 0/1 ผ่าน `GPIO_IN_REG`</p>
+                    </div>
+                    <div class="p-3 border rounded-lg bg-slate-50">
+                        <div class="font-bold text-slate-800 mb-1">2. Output Driver (Push-Pull / Open Drain)</div>
+                        <p class="text-slate-600">มีทรานซิสเตอร์ PMOS และ NMOS ทำหน้าที่ปล่อยแรงดัน HIGH (3.3V) หรือ LOW (0V) ไปยังภายนอก</p>
+                    </div>
+                    <div class="p-3 border rounded-lg bg-slate-50">
+                        <div class="font-bold text-slate-800 mb-1">3. Internal Pull-Up / Pull-Down</div>
+                        <p class="text-slate-600">ความต้านทานภายใน (~45 kΩ) ป้องกันสภาวะ "ขาเคว้ง" (Floating Pin) เมื่อยังไม่มีการกดสวิตช์</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub Question 1.3 -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex items-center gap-2 border-b pb-3 border-slate-100">
+                    <span class="bg-blue-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">ข้อย่อย 1.3</span>
+                    <h3 class="font-bold text-lg text-slate-800">โหมดการทำงานของ GPIO ในภาษา C (ESP-IDF / Native Driver)</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left text-slate-600 border border-slate-200 rounded-lg">
+                        <thead class="bg-slate-100 text-slate-700 font-bold uppercase border-b">
+                            <tr>
+                                <th class="p-3">โหมด (GPIO Mode)</th>
+                                <th class="p-3">คำอธิบาย</th>
+                                <th class="p-3">ตัวอย่างฟังก์ชัน C ที่ใช้</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr>
+                                <td class="p-3 font-mono font-bold text-blue-600">GPIO_MODE_INPUT</td>
+                                <td class="p-3">อ่านค่าจากอุปกรณ์ภายนอก เช่น สวิตช์, เซนเซอร์ดิจิทัล</td>
+                                <td class="p-3 font-mono text-slate-800">gpio_get_level(GPIO_NUM_4);</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono font-bold text-blue-600">GPIO_MODE_OUTPUT</td>
+                                <td class="p-3">ส่งค่าไปควบคุมอุปกรณ์ภายนอก เช่น LED, Relay, Buzzer</td>
+                                <td class="p-3 font-mono text-slate-800">gpio_set_level(GPIO_NUM_2, 1);</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono font-bold text-blue-600">GPIO_MODE_INPUT_OUTPUT</td>
+                                <td class="p-3">ทำหน้าที่ทั้งส่งและอ่านค่ากลับได้ในขาเดียว (เช่น I2C, OneWire)</td>
+                                <td class="p-3 font-mono text-slate-800">gpio_config(&io_conf);</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: FREERTOS ================= -->
+        <section id="sec-rtos" class="tab-content hidden space-y-6">
+            <div class="bg-emerald-50 border-l-4 border-emerald-600 p-4 rounded-r-lg">
+                <h2 class="text-xl font-bold text-emerald-900 flex items-center gap-2">
+                    <i class="fa-solid fa-cubes"></i> หมวด 2: FreeRTOS จากใบงานการทดลองที่ 4 (3 ข้อย่อย)
+                </h2>
+                <p class="text-sm text-emerald-800 mt-1">สรุปคำตอบตรงตามนิยามและฟังก์ชันที่ปรากฏในเอกสารทดลอง RTOS.pdf</p>
+            </div>
+
+            <!-- RTOS Question 2.1 -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center gap-2 border-b pb-3 border-slate-100">
+                    <span class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">ข้อย่อย 2.1</span>
+                    <h3 class="font-bold text-lg text-slate-800">FreeRTOS คืออะไร และมีคุณสมบัติเด่นอะไรบ้าง? (ตอบตามเอกสาร)</h3>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-lg text-sm space-y-2 border border-slate-200">
+                    <p class="text-slate-800"><strong>นิยาม:</strong> FreeRTOS คือ ระบบปฏิบัติการเรียลไทม์แบบโอเพ่นซอร์ส (Open-source Real-Time Operating System) ที่ออกแบบมาสำหรับไมโครคอนโทรลเลอร์และระบบฝังตัว (Embedded Systems) ช่วยให้สามารถจัดการหลายงาน (Multitasking) ได้อย่างมีประสิทธิภาพ</p>
+                    <div class="font-bold text-emerald-800 pt-2">8 คุณสมบัติเด่นของ FreeRTOS ในเอกสาร:</div>
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                        <li class="bg-white p-2 rounded border"><i class="fa-solid fa-check text-emerald-500 mr-1"></i> <strong>1. Multitasking:</strong> รองรับการทำงานหลาย Task พร้อมกัน</li>
+                        <li class="bg-white p-2 rounded border"><i class="fa-solid fa-check text-emerald-500 mr-1"></i> <strong>2. Preemptive Scheduling:</strong> แทรก Task สำคัญสูงกว่าได้ทันที</li>
+                        <li class="bg-white p-2 rounded border"><i class="fa-solid fa-check text-emerald-500 mr-1"></i> <strong>3. Cooperative Scheduling:</strong> สลับ Task โดยสมัครใจ ไม่แย่ง CPU</li>
+                        <li class="bg-white p-2 rounded border"><i class="fa-solid fa-check text-emerald-500 mr-1"></i> <strong>4. Task Priority:</strong> กำหนดลำดับความสำคัญของแต่ละ Task ได้</li>
+                        <li class="bg-white p-2 rounded border"><i class="fa-solid fa-check text-emerald-500 mr-1"></i> <strong>5. Inter-Task Comm:</strong> มี Queue, Semaphore, Mutex, Event Group</li>
+                        <li class="bg-white p-2 rounded border"><i class="fa-solid fa-check text-emerald-500 mr-1"></i> <strong>6. Software Timer:</strong> ตั้งเวลาการทำงานของฟังก์ชันได้</li>
+                        <li class="bg-white p-2 rounded border"><i class="fa-solid fa-check text-emerald-500 mr-1"></i> <strong>7. Low Power Support:</strong> จัดการพลังงานอย่างมีประสิทธิภาพ</li>
+                        <li class="bg-white p-2 rounded border"><i class="fa-solid fa-check text-emerald-500 mr-1"></i> <strong>8. Portability:</strong> รองรับหลายชิป (ESP32, STM32, RP2040)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- RTOS Question 2.2 -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center gap-2 border-b pb-3 border-slate-100">
+                    <span class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">ข้อย่อย 2.2</span>
+                    <h3 class="font-bold text-lg text-slate-800">เปรียบเทียบ Preemptive Scheduling vs Cooperative Scheduling และ Task Priority</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="bg-indigo-50/50 p-4 rounded-lg border border-indigo-200">
+                        <div class="font-bold text-indigo-900 mb-2"><i class="fa-solid fa-bolt text-indigo-600"></i> Preemptive Scheduling (การขัดจังหวะ)</div>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            ระบบ OS จะสอดส่องตลอดเวลา หากมี Task ที่มีความสำคัญ (Priority) สูงกว่าพร้อมทำงาน OS จะ <strong>"แย่งขัดจังหวะ (Preempt)"</strong> ตัดการทำงานของ Task ปัจจุบันทันที เพื่อให้ Task ที่สำคัญกว่าทำงานก่อน
+                        </p>
+                    </div>
+                    <div class="bg-teal-50/50 p-4 rounded-lg border border-teal-200">
+                        <div class="font-bold text-teal-900 mb-2"><i class="fa-solid fa-handshake text-teal-600"></i> Cooperative Scheduling (ร่วมมือกัน)</div>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            Task ปัจจุบันจะทำงานไปเรื่อยๆ จนกว่าจะ <strong>"ยอมปล่อย CPU เอง"</strong> (เช่น เรียกคำสั่ง `vTaskDelay` หรือคืนค่าทรัพยากร) Task อื่นถึงจะมีสิทธิ์ขึ้นมาทำงานต่อ
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RTOS Question 2.3 -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center gap-2 border-b pb-3 border-slate-100">
+                    <span class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">ข้อย่อย 2.3</span>
+                    <h3 class="font-bold text-lg text-slate-800">ถอดรหัสฟังก์ชัน `xTaskCreate` ทั้ง 6 พารามิเตอร์ (ข้อสอบชอบถามมาก!)</h3>
+                </div>
+                <div class="bg-slate-900 text-slate-200 p-4 rounded-lg text-xs font-mono overflow-x-auto">
+                    xTaskCreate(vTaskFunction, "Task1", 2048, NULL, 1, NULL);
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                    <div class="p-3 bg-slate-50 border rounded">
+                        <strong class="text-emerald-700 block">1. pvTaskCode (vTaskFunction)</strong>
+                        ชื่อฟังก์ชัน C ที่จะให้ Task นี้เข้าไปรัน
+                    </div>
+                    <div class="p-3 bg-slate-50 border rounded">
+                        <strong class="text-emerald-700 block">2. pcName ("Task1")</strong>
+                        ชื่อของ Task ข้อความ String ไว้ใช้ Debug
+                    </div>
+                    <div class="p-3 bg-slate-50 border rounded">
+                        <strong class="text-emerald-700 block">3. usStackDepth (2048)</strong>
+                        ขนาดหน่วยความจำ Stack (Bytes)
+                    </div>
+                    <div class="p-3 bg-slate-50 border rounded">
+                        <strong class="text-emerald-700 block">4. pvParameters (NULL)</strong>
+                        พารามิเตอร์ที่ส่งเข้าฟังก์ชัน (ถ้าไม่มีใส่ NULL)
+                    </div>
+                    <div class="p-3 bg-slate-50 border rounded">
+                        <strong class="text-emerald-700 block">5. uxPriority (1)</strong>
+                        ระดับความสำคัญ (ยิ่งตัวเลขมาก ยิ่งสำคัญมาก)
+                    </div>
+                    <div class="p-3 bg-slate-50 border rounded">
+                        <strong class="text-emerald-700 block">6. pvCreatedTask (NULL)</strong>
+                        ตัวชี้ตำแหน่งเก็บ Handle (ถ้าไม่ใช้ใส่ NULL)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: C CODE ANALYSIS ================= -->
+        <section id="sec-c-code" class="tab-content hidden space-y-6">
+            <div class="bg-purple-50 border-l-4 border-purple-600 p-4 rounded-r-lg">
+                <h2 class="text-xl font-bold text-purple-900 flex items-center gap-2">
+                    <i class="fa-solid fa-code"></i> หมวด 3: ติววิเคราะห์และแก้โค้ดภาษา C (สำหรับคนไม่มีพื้นฐาน)
+                </h2>
+                <p class="text-sm text-purple-800 mt-1">ปูพื้นฐานไวยากรณ์ C ที่ต้องใช้ + เฉลยแบบฝึกหัดจับผิดโค้ด 2 ข้อ</p>
+            </div>
+
+            <!-- C Basics for Absolute Beginners -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                <h3 class="font-bold text-md text-purple-900 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-yellow-500"></i> สรุป 4 กฎเหล็กภาษา C ที่ใช้ใน ESP32
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="bg-slate-50 p-3 rounded border">
+                        <span class="font-bold text-purple-700">1. เครื่องหมายเซมิโคลอน (;)</span>
+                        <p class="text-slate-600">ทุกๆ คำสั่ง ต้องปิดท้ายด้วย <code class="bg-slate-200 px-1 text-red-600 font-bold">;</code> เสมอ หากลืมจะเกิด Compile Error</p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded border">
+                        <span class="font-bold text-purple-700">2. เปรียบเทียบ (==) vs กำหนดค่า (=)</span>
+                        <p class="text-slate-600"><code class="bg-slate-200 px-1 font-bold">if (x == 5)</code> แปลว่า "ถ้า x เท่ากับ 5" <br><code class="bg-slate-200 px-1 text-red-600 font-bold">x = 5;</code> แปลว่า "ให้เอาเลข 5 ไปใส่ในตัวแปร x"</p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded border">
+                        <span class="font-bold text-purple-700">3. วนซ้ำไม่รู้จบ while(1)</span>
+                        <p class="text-slate-600">ในงาน Microcontroller / RTOS Task ต้องมี <code class="bg-slate-200 px-1 font-bold">while(1) { ... }</code> เพื่อให้โปรแกรมทำงานวนลูปไปตลอด</p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded border">
+                        <span class="font-bold text-purple-700">4. ป้องกัน CPU ค้างด้วย vTaskDelay</span>
+                        <p class="text-slate-600">ใน FreeRTOS ทุกลูป <code class="bg-slate-200 px-1">while(1)</code> **ต้องมี** คำสั่ง delay เพื่อยอมให้ Task อื่นทำงานได้</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Code Analysis 1 -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+                    <span class="bg-purple-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">โจทย์โค้ดข้อที่ 1</span>
+                    <span class="text-xs text-red-600 font-bold"><i class="fa-solid fa-bug"></i> โจทย์ให้หาจุดผิดและแก้ให้ถูก</span>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-700">🔴 โค้ดต้นฉบับที่มีจุดผิด (โจทย์จากข้อสอบ):</p>
+                    <pre class="bg-slate-900 text-red-300 p-4 rounded-lg text-xs overflow-x-auto"><code>void vTaskFunction(void *pvParameters) {
+    // ผิดจุดที่ 1: ไม่มี while(1) ทำให้ Task ทำงานรอบเดียวแล้วหลุด
+    printf("Hello from Task\n");
+    // ผิดจุดที่ 2: ลืมใส่ vTaskDelay หรือไม่มี delay ทำให้ Watchdog Reset
+}
+
+void app_main() {
+    // ผิดจุดที่ 3: สะกดชื่อฟังก์ชันผิด หรือส่ง Parameter ไม่ครบ
+    xTaskCreate(vTaskFunction, "Task1", 2048, NULL); // ขาด Priority และ Task Handle!
+}</code></pre>
+                </div>
+
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200 text-xs space-y-2">
+                    <div class="font-bold text-red-800 text-sm">🔍 จุดผิดและการวิเคราะห์ (อธิบายในข้อสอบ):</div>
+                    <ol class="list-decimal list-inside space-y-1 text-slate-700">
+                        <li><strong>ขาด ลูป `while(1)` ใน Task Function:</strong> Task ของ FreeRTOS ห้ามทำงานจบแล้วคืนค่าออกไปเฉยๆ เพราะจะทำให้เกิดการ Crash หรือ Crash Loop</li>
+                        <li><strong>พารามิเตอร์ของ `xTaskCreate` ไม่ครบ:</strong> ฟังก์ชัน `xTaskCreate` ต้องการทั้งหมด **6 พารามิเตอร์** แต่ในโค้ดส่งไปเพียง 4 ตัวเท่านั้น</li>
+                        <li><strong>ไม่มีการเรียก delay คืน CPU:</strong> ต้องใส่ `vTaskDelay(...)` ไว้ภายในลูปเพื่อป้องกันไม่ให้ Task ครอง CPU 100% จนระบบค้าง</li>
+                    </ol>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-700">🟢 โค้ดที่แก้ไขถูกต้องสมบูรณ์ (นำไปเขียนตอบ):</p>
+                    <pre class="bg-slate-900 text-emerald-400 p-4 rounded-lg text-xs overflow-x-auto"><code>#include &lt;stdio.h&gt;
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+void vTaskFunction(void *pvParameters) {
+    while(1) { // 🟢 แก้ไข 1: เพิ่ม while(1) วนลูปไม่รู้จบ
+        printf("Hello from Task\n");
+        vTaskDelay(1000 / portTICK_PERIOD_MS); // 🟢 แก้ไข 2: เพิ่ม delay 1 วินาที
+    }
+}
+
+void app_main() {
+    // 🟢 แก้ไข 3: ส่งพารามิเตอร์ครบทั้ง 6 ตัว (เติม Priority=1 และ Handle=NULL)
+    xTaskCreate(vTaskFunction, "Task1", 2048, NULL, 1, NULL);
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Code Analysis 2 -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+                    <span class="bg-purple-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">โจทย์โค้ดข้อที่ 2</span>
+                    <span class="text-xs text-red-600 font-bold"><i class="fa-solid fa-bug"></i> โจทย์โปรแกรมอ่านสวิตช์และแสดงผลผิดพลาด</span>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-700">🔴 โค้ดต้นฉบับที่มีจุดผิด:</p>
+                    <pre class="bg-slate-900 text-red-300 p-4 rounded-lg text-xs overflow-x-auto"><code>void app_main() {
+    int button_state;
+    // ผิดจุดที่ 1: ใช้ = (กำหนดค่า) แทนที่จะเป็น == (เปรียบเทียบ)
+    if (button_state = 1) { 
+        printf("Button Pressed\n");
+    }
+    // ผิดจุดที่ 2: ลืมตั้งค่าทิศทาง GPIO เป็น Input/Output ก่อนใช้งาน
+    // ผิดจุดที่ 3: ไม่มีลูปทำให้โปรแกรมรันบรรทัดเดียวแล้วจบทำงานทันที
+}</code></pre>
+                </div>
+
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200 text-xs space-y-2">
+                    <div class="font-bold text-red-800 text-sm">🔍 จุดผิดและการวิเคราะห์:</div>
+                    <ol class="list-decimal list-inside space-y-1 text-slate-700">
+                        <li><strong>ใช้เครื่องหมายผิด `if (button_state = 1)`:</strong> ในภาษา C เครื่องหมาย `=` ตัวเดียวคือการมอบค่า (Assign) ไม่ใช่การเปรียบเทียบ เงื่อนไขนี้จะกลายเป็นจริงเสมอ! ต้องแก้ไขเป็น `==`</li>
+                        <li><strong>ลืมกำหนดโหมด GPIO:</strong> ก่อนอ่านหรือสั่งงานขา GPIO ต้องใช้คำสั่งกำหนดทิศทางก่อน (เช่น `gpio_set_direction`)</li>
+                        <li><strong>ขาดลูปในการตรวจจับ:</strong> การอ่านสวิตช์ในไมโครคอนโทรลเลอร์ต้องอ่านวนซ้ำตลอดเวลาใน `while(1)`</li>
+                    </ol>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-700">🟢 โค้ดที่แก้ไขถูกต้องสมบูรณ์:</p>
+                    <pre class="bg-slate-900 text-emerald-400 p-4 rounded-lg text-xs overflow-x-auto"><code>#include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#define BUTTON_PIN GPIO_NUM_4
+
+void app_main() {
+    // 🟢 แก้ไข 1: กำหนดโหมดให้ขา GPIO4 เป็น INPUT
+    gpio_reset_pin(BUTTON_PIN);
+    gpio_set_direction(BUTTON_PIN, GPIO_MODE_INPUT);
+
+    while(1) { // 🟢 แก้ไข 2: เพิ่มการวนลูปตรวจจับตลอดเวลา
+        int button_state = gpio_get_level(BUTTON_PIN);
+        
+        if (button_state == 1) { // 🟢 แก้ไข 3: เปลี่ยนจาก = เป็น ==
+            printf("Button Pressed!\n");
+        }
+        vTaskDelay(100 / portTICK_PERIOD_MS); // หน่วงเวลาลดสัญญาณรบกวน
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 4: FLOWCHART ================= -->
+        <section id="sec-flowchart" class="tab-content hidden space-y-6">
+            <div class="bg-amber-50 border-l-4 border-amber-600 p-4 rounded-r-lg">
+                <h2 class="text-xl font-bold text-amber-900 flex items-center gap-2">
+                    <i class="fa-solid fa-diagram-project"></i> หมวด 4: การออกแบบ Flowchart ระบบนับคนเข้าห้องน้ำ
+                </h2>
+                <p class="text-sm text-amber-800 mt-1">ตัวอย่างโจทย์ออกแบบระบบไมโครคอนโทรลเลอร์ตรวจจับทิศทางและนับจำนวนคน</p>
+            </div>
+
+            <!-- System Concept -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="font-bold text-lg text-slate-800 border-b pb-2">1. แนวคิดและส่วนประกอบของระบบ (Bathroom People Counter)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-slate-50 p-3 rounded-lg border">
+                        <span class="font-bold text-amber-700 block mb-1"><i class="fa-solid fa-eye"></i> เซนเซอร์ 2 ตัว (Sensor A & B)</span>
+                        <p class="text-slate-600">ติดตั้งตรงทางเข้าเรียงต่อกัน เพื่อให้รู้ทิศทาง:</p>
+                        <ul class="list-disc list-inside mt-1 space-y-0.5">
+                            <li><strong>เข้า:</strong> A ตัดก่อน แล้วตามด้วย B</li>
+                            <li><strong>ออก:</strong> B ตัดก่อน แล้วตามด้วย A</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg border">
+                        <span class="font-bold text-amber-700 block mb-1"><i class="fa-solid fa-calculator"></i> ตัวแปรนับจำนวน (Count)</span>
+                        <p class="text-slate-600">ตัวแปรเก็บจำนวนคนในห้องน้ำ:</p>
+                        <ul class="list-disc list-inside mt-1 space-y-0.5">
+                            <li>เดินเข้าห้องน้ำ: <code class="font-bold">Count = Count + 1</code></li>
+                            <li>เดินออกจากห้องน้ำ: <code class="font-bold">Count = Count - 1</code></li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg border">
+                        <span class="font-bold text-amber-700 block mb-1"><i class="fa-solid fa-lightbulb"></i> อุปกรณ์แสดงผล & สถานะ</span>
+                        <p class="text-slate-600">ป้ายไฟหน้าห้องน้ำ:</p>
+                        <ul class="list-disc list-inside mt-1 space-y-0.5">
+                            <li>ถ้า <code class="font-bold">Count > 0</code>: แสดงสถานะ "มีคนอยู่ (Occupied)" / เปิดไฟแดง</li>
+                            <li>ถ้า <code class="font-bold">Count == 0</code>: แสดงสถานะ "ว่าง (Vacant)" / เปิดไฟเขียว</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flowchart Diagram Visual -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="font-bold text-lg text-slate-800 border-b pb-2">2. แผนผัง Flowchart การทำงาน (วาดตามรูปนี้ในข้อสอบ)</h3>
+
+                <div class="flex justify-center my-4">
+                    <div class="w-full max-w-md bg-slate-900 text-slate-100 p-6 rounded-xl font-mono text-xs shadow-inner space-y-3 text-center">
+                        <!-- START -->
+                        <div class="bg-emerald-600 text-white py-1 px-4 rounded-full inline-block font-bold">
+                            [ START / เริ่มต้นโปรแกรม ]
+                        </div>
+                        <div class="text-slate-400">↓</div>
+
+                        <!-- INIT -->
+                        <div class="bg-blue-900 border border-blue-500 py-2 px-3 rounded text-blue-200">
+                            กำหนดค่าเริ่มต้น (Initialize)<br>GPIO, Count = 0, LED = เขียว (ว่าง)
+                        </div>
+                        <div class="text-slate-400">↓</div>
+
+                        <!-- READ SENSORS -->
+                        <div class="bg-slate-800 border border-slate-600 py-2 px-3 rounded">
+                            อ่านค่าเซนเซอร์ Sensor A และ Sensor B
+                        </div>
+                        <div class="text-slate-400">↓</div>
+
+                        <!-- DECISION 1: PERSON ENTERING -->
+                        <div class="bg-amber-900/60 border border-amber-500 p-3 rounded transform rotate-0">
+                            <span class="text-amber-200 font-bold">ตรวจสอบ: Sensor A ถูกบังก่อน B ?</span><br>
+                            <span class="text-xs text-amber-300">(คนกำลังเดินเข้าห้องน้ำ)</span>
+                        </div>
+                        <div class="flex justify-around text-slate-400 text-xs px-8">
+                            <span>YES ↓</span>
+                            <span>NO ↓</span>
+                        </div>
+
+                        <!-- BRANCH 1 -->
+                        <div class="grid grid-cols-2 gap-2 text-left">
+                            <div class="bg-emerald-900/50 p-2 rounded border border-emerald-600">
+                                <span class="text-emerald-300 font-bold block text-center">ทางเข้า (IN)</span>
+                                • Count = Count + 1<br>
+                                • รอนานจนเซนเซอร์ว่าง
+                            </div>
+                            <div class="bg-slate-800 p-2 rounded border border-slate-700">
+                                <span class="text-amber-300 font-bold block text-center">เช็คต่อ: B ถูกบังก่อน A ?</span>
+                                <span class="text-[10px] text-slate-400 block text-center">(คนเดินออก)</span>
+                                <span class="text-emerald-400 font-bold block mt-1">YES → Count = Count - 1</span>
+                            </div>
+                        </div>
+
+                        <div class="text-slate-400">↓</div>
+
+                        <!-- COUNT BOUNDARY CHECK -->
+                        <div class="bg-slate-800 border border-slate-600 py-1.5 px-3 rounded text-[11px]">
+                            ตรวจสอบค่า Count &lt; 0 หรือไม่? (ถ้า ใช่ ให้ set Count = 0)
+                        </div>
+                        <div class="text-slate-400">↓</div>
+
+                        <!-- DISPLAY / LED UPDATE -->
+                        <div class="bg-purple-900/50 border border-purple-500 p-2.5 rounded text-purple-200">
+                            <strong>อัปเดตสถานะหน้าห้องน้ำ:</strong><br>
+                            • ถ้า Count &gt; 0 → แสดงไฟแดง (มีคนอยู่)<br>
+                            • ถ้า Count == 0 → แสดงไฟเขียว (ห้องน้ำว่าง)
+                        </div>
+                        <div class="text-slate-400">↓</div>
+
+                        <!-- LOOP BACK -->
+                        <div class="bg-slate-800 text-slate-400 py-1 px-3 rounded text-[10px] inline-block border border-slate-700">
+                            ↺ วนลูปกลับไปอ่านค่าเซนเซอร์ใหม่ (Loop)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text Description for Written Exam -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                <h3 class="font-bold text-lg text-slate-800 border-b pb-2">3. สรุปข้อความบรรยายการทำงาน (ใช้เขียนบรรยายในข้อสอบ)</h3>
+                <div class="bg-slate-50 p-4 rounded-lg text-xs space-y-2 text-slate-700 leading-relaxed border">
+                    <p><strong>ขั้นตอนการทำงานของระบบนับคนเข้าห้องน้ำ:</strong></p>
+                    <ol class="list-decimal list-inside space-y-1.5">
+                        <li><strong>การเริ่มต้นระบบ (Initialization):</strong> ไมโครคอนโทรลเลอร์ตั้งค่าขา GPIO สำหรับรับค่าจากเซนเซอร์ A, B และกำหนดตัวแปร <code class="bg-slate-200 px-1 font-bold">Count = 0</code> พร้อมเปิดไฟเขียวแสดงสถานะ "ห้องน้ำว่าง"</li>
+                        <li><strong>การตรวจจับคนเข้า (Entrance Detection):</strong> เมื่อมีคนเดินเข้า จะบังเซนเซอร์ A ก่อน แล้วตามด้วยเซนเซอร์ B ระบบจะทำการเพิ่มค่า <code class="bg-slate-200 px-1 font-bold">Count = Count + 1</code></li>
+                        <li><strong>การตรวจจับคนออก (Exit Detection):</strong> เมื่อมีคนเดินออกจากห้องน้ำ จะบังเซนเซอร์ B ก่อน แล้วตามด้วยเซนเซอร์ A ระบบจะทำการลดค่า <code class="bg-slate-200 px-1 font-bold">Count = Count - 1</code></li>
+                        <li><strong>การป้องกันค่าผิดพลาด (Boundary Check):</strong> หากค่า <code class="bg-slate-200 px-1">Count &lt; 0</code> ระบบจะทำการปรับค่าให้กลายเป็น <code class="bg-slate-200 px-1 font-bold">0</code> เสมอ เพื่อป้องกันจำนวนคนติดลบ</li>
+                        <li><strong>การแสดงผลสถานะ (Output Display):</strong> 
+                            <ul class="list-disc list-inside pl-4 mt-1">
+                                <li>ถ้า <code class="bg-slate-200 px-1">Count &gt; 0</code>: แสดงผลหน้าจอ/ไฟแดงว่า **"มีคนอยู่ (Occupied)"**</li>
+                                <li>ถ้า <code class="bg-slate-200 px-1">Count == 0</code>: แสดงผลหน้าจอ/ไฟเขียวว่า **"ห้องน้ำว่าง (Vacant)"**</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-5xl mx-auto px-4 mt-12 text-center text-xs text-slate-500 border-t pt-6">
+        <p> ESP32 Microcontroller Study Guide | สร้างขึ้นเพื่อการทบทวนเตรียมสอบวิชาไมโครคอนโทรลเลอร์</p>
+    </footer>
+
+    <!-- Tab Switching JavaScript -->
+    <script>
+        function switchTab(tabId) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.add('hidden'));
+
+            // Remove active style from all tab buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-slate-600');
+            });
+
+            // Show selected tab content
+            document.getElementById('sec-' + tabId).classList.remove('hidden');
+
+            // Set active button style
+            const activeBtn = document.getElementById('tab-' + tabId);
+            activeBtn.classList.add('tab-active');
+            activeBtn.classList.remove('text-slate-600');
+        }
+    </script>
+</body>
+</html>
+```eof
+
+### สรุปสิ่งที่จัดเตรียมไว้ให้ในไฟล์ติวสอบ:
+
+1. **GPIO & โครงสร้าง ESP32:** รวบรวมขาพิเศษ (Input-only, Strapping pins, UART/I2C), บล็อกโครงสร้างภายใน (Schmitt Trigger, Push-Pull/Open-Drain, Pull-Up/Pull-Down) และโหมดการทำงาน
+2. **FreeRTOS (จากเอกสาร RTOS.pdf):** นิยาม, 8 คุณสมบัติเด่น, ความแตกต่างระหว่าง Preemptive และ Cooperative Scheduling รวมถึงถอดรหัสพารามิเตอร์ 6 ตัวของ `xTaskCreate`
+3. **วิเคราะห์และแก้ไขโค้ด C (ฉบับมือใหม่):** สรุปกฎเหล็กภาษา C + ข้อสอบจับผิดโค้ด 2 ข้อ พร้อมจุดวิเคราะห์ เหตุผลที่ผิด และโค้ดแก้ไข
+4. **ออกแบบ Flowchart เครื่องนับคนเข้าห้องน้ำ:** แผนผังจำลองตรรกะเซนเซอร์ 2 ตัวตรวจจับทิศทางเข้า-ออก และข้อความบรรยายสรุปสำหรับนำไปเขียนอธิบายในข้อสอบ
+
+ขอให้โชคดีในการสอบครับ! หากมีหัวข้อไหนอยากให้เน้นย้ำเพิ่มเติม สามารถแจ้งได้เลยนะครับ
